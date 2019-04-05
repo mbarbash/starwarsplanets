@@ -2,9 +2,11 @@ import React, { Component } from 'react';
 import ItemList from '../components/ItemList';
 import Item from '../components/Item';
 import Navbar from '../components/Navbar';
-import ErrorBoundry from '../components/ErrorBoundry';
+import ErrorBoundry from './ErrorBoundry';
+import Loader from '../components/Loader';
 import './App.css';
 
+const ErrorBoundryLoading = Loader(ErrorBoundry);
 class App extends Component {
 
   constructor(props) {
@@ -18,6 +20,7 @@ class App extends Component {
       showingEnd: 0,
       residents: {},
       error: null,
+      loading: true
     }
   }
 
@@ -27,6 +30,7 @@ class App extends Component {
   makePlanetKey = planetName => planetName.toLowerCase().replace(' ', '_');
 
   fetchPlanets = async (url='https://swapi.co/api/planets/', dir=null) => {
+    this.setState({ loading: true });
     try {
       const response = await fetch(url)
       const data = await response.json();
@@ -66,12 +70,13 @@ class App extends Component {
         previous: previous,
         count: count,
         showingStart: showingStart,
-        showingEnd: showingEnd
+        showingEnd: showingEnd,
+        loading: false
       });
     }
     catch(error) {
       throw Error(error);
-      this.setState({ error: error });
+      this.setState({ loading: false });
     }
   }
 
@@ -81,25 +86,20 @@ class App extends Component {
 
   render() {
     const { planets } = this.state;
+    console.log(this.state.loading);
 
-    return !planets.length ? <div className="App tc">
-          <header className="App-header">
-            <h1>Loading</h1>
-          </header>
-        </div>
-    : (
+    return (
       <div className="App tc">
         <header className="App-header">
           <h1>Star Wars Planet Intel</h1>
         </header>
-        <ErrorBoundry>
+        <ErrorBoundryLoading isLoading={this.state.loading}>
           <Navbar state={this.state} prevClick={this.prevClick} nextClick={this.nextClick}  />
-            <ItemList state={this.state} makePlanetKey=
-            {this.makePlanetKey}>
+            <ItemList state={this.state} makePlanetKey={this.makePlanetKey}>
               <Item />
             </ItemList>
           <Navbar state={this.state} prevClick={this.prevClick} nextClick={this.nextClick}  />
-        </ErrorBoundry>
+        </ErrorBoundryLoading>
       </div>
     );
   }

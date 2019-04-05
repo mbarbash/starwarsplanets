@@ -12,7 +12,7 @@ const Navbar = ({ prevClick, nextClick, state }) => {
 			<div className="navbar">
 	       	 {prevButton} {nextButton}
 	      	</div>
-	      	<p>{`Displaying ${showingStart} - ${showingEnd} of ${count} planets`}</p>
+	      	<p>{ count ? `Displaying ${showingStart} - ${showingEnd} of ${count} planets` : ""}</p>
       	</div>
 	)
 }

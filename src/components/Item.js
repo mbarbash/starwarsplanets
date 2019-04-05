@@ -20,7 +20,7 @@ const Item = ({ planet, residents, planetKey }) => {
 	} = planet;
 
 	return (
-		<div>
+		<div className="list code mw6">
           <h2>{name}</h2>
           <ul className="list tl">
             <li>Day Length: {rotation_period} days</li>  
