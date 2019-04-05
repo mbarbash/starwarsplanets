@@ -1,21 +1,9 @@
 import React, { Component } from 'react';
-//import Item from '../components/Item';
+import ItemList from '../components/ItemList';
+import Item from '../components/Item';
+import Navbar from '../components/Navbar';
+import ErrorBoundry from '../components/ErrorBoundry';
 import './App.css';
-
-/*const fetchPlanets = async () => {
-  try {
-    const response = await fetch('https://swapi.co/api/planets')
-    const data = await response.json();
-    return data.results;
-  }
-  catch(error) {
-    console.log(error);
-  }
-}*/
-
-
-
-
 
 class App extends Component {
 
@@ -28,14 +16,9 @@ class App extends Component {
       count: 0,
       showingStart: 0,
       showingEnd: 0,
-      residents: {}
+      residents: {},
+      error: null,
     }
-  }
-
-  addThousandsSeparators = (num) => {
-    var num_parts = num.toString().split(".");
-    num_parts[0] = num_parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-    return num_parts.join(".");
   }
 
   prevClick = (event) => this.fetchPlanets(this.state.previous, event.target.name);
@@ -49,6 +32,7 @@ class App extends Component {
       const data = await response.json();
       const { results, next, previous, count } = data;
       const residentsState = {};
+
       for (let planet of results) {
         const { name, residents } = planet;
         let planetResidents = [];
@@ -59,6 +43,7 @@ class App extends Component {
         }
         residentsState[this.makePlanetKey(name)] = planetResidents;
       }
+
       let showingStart, showingEnd;
       switch(dir) {
         case 'prev':
@@ -73,6 +58,7 @@ class App extends Component {
           showingStart = 1;
           showingEnd = results.length;
       }
+
       this.setState({ 
         planets: results, 
         residents: residentsState,
@@ -84,7 +70,8 @@ class App extends Component {
       });
     }
     catch(error) {
-      console.log(error);
+      throw Error(error);
+      this.setState({ error: error });
     }
   }
 
@@ -93,14 +80,8 @@ class App extends Component {
   }
 
   render() {
-    const { planets, residents, next, previous, count, showingStart, showingEnd } = this.state;
-    let prevButton, nextButton;
-    if (previous) {
-        prevButton = <button name="prev" onClick={this.prevClick}>Previous</button>
-    }
-    if (next) {
-      nextButton = <button name="next" onClick={this.nextClick}>Next</button>
-    }
+    const { planets } = this.state;
+
     return !planets.length ? <div className="App tc">
           <header className="App-header">
             <h1>Loading</h1>
@@ -111,41 +92,14 @@ class App extends Component {
         <header className="App-header">
           <h1>Star Wars Planet Intel</h1>
         </header>
-        <div>
-          <div>
-            {prevButton} {nextButton}
-          </div>
-          <p>{`Displaying ${showingStart} - ${showingEnd} of ${count} planets`}</p>
-        </div>
-        {
-        planets.map((planet) => {
-          const { name, rotation_period, orbital_period, diameter, climate, gravity, terrain, surface_water } = planet;
-          const planetKey = this.makePlanetKey(name);
-          
-          return (
-            <div key={planetKey}>
-              <h2>{name}</h2>
-              <ul className="list tl">
-                <li>Day Length: {rotation_period} days</li>  
-                <li>Year Length: {this.addThousandsSeparators(orbital_period)} days</li>  
-                <li>Diameter: {this.addThousandsSeparators(diameter)} miles</li>  
-                <li>Climate Zones: {climate}</li>  
-                <li>Gravitational Strength: {gravity}</li>  
-                <li>Terrian Types: {terrain}</li> 
-                <li>Percentage of Surface Covered by Water: {surface_water === 'unknown' ? 'unknown' 
-                  : surface_water + '%'}</li> 
-                <li>Notable Residents: {residents[planetKey].length ? residents[planetKey].join(', ') : "None"}</li>  
-              </ul>
-            </div>
-          )
-         })
-      }
-        <div>
-          <div>
-            {prevButton} {nextButton}
-          </div>
-          <p>{`Displaying ${showingStart} - ${showingEnd} of ${count} planets`}</p>
-        </div>
+        <ErrorBoundry>
+          <Navbar state={this.state} prevClick={this.prevClick} nextClick={this.nextClick}  />
+            <ItemList state={this.state} makePlanetKey=
+            {this.makePlanetKey}>
+              <Item />
+            </ItemList>
+          <Navbar state={this.state} prevClick={this.prevClick} nextClick={this.nextClick}  />
+        </ErrorBoundry>
       </div>
     );
   }
