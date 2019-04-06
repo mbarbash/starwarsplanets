@@ -20,9 +20,9 @@ const Item = ({ planet, residents, planetKey }) => {
 	} = planet;
 
 	return (
-		<div className="list code mw6">
+		<div className="">
           <h2>{name}</h2>
-          <ul className="list tl">
+          <ul className="">
             <li>Day Length: {rotation_period} days</li>  
             <li>Year Length: {addThousandsSeparators(orbital_period)} days</li>  
             <li>Diameter: {addThousandsSeparators(diameter)} miles</li>  

@@ -1,13 +1,19 @@
-.App {
-  text-align: center;
+body {
+	/*margin: 0;
+	padding: 0;*/
+	font-family: Roboto;
+	background: url('./Galaxymap_p1.jpg') fixed;
 }
-
 .App-header {
   background-color: #282c34;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  font-size: calc(10px + 2vmin);
+  /*font-size: calc(1s0px + 2vmin);*/
+  position: fixed;
+  width: 100%;
+  padding-top: 20px;
+  height: 30vh;
   color: white;
 }

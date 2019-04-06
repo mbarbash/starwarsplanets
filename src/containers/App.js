@@ -19,13 +19,20 @@ class App extends Component {
       showingStart: 0,
       showingEnd: 0,
       residents: {},
+      rotationPeriods: [], 
+      orbitalPeriods: [], 
+      diameters: [], 
+      climates: [], 
+      gravities: [], 
+      terrains: [], 
+      surfaceWaters: [],
       error: null,
       loading: true
     }
   }
 
-  prevClick = (event) => this.fetchPlanets(this.state.previous, event.target.name);
-  nextClick = (event) => this.fetchPlanets(this.state.next, event.target.name);
+  prevClick = (event) => this.fetchPlanets(this.state.previous, event.currentTarget.name);
+  nextClick = (event) => this.fetchPlanets(this.state.next, event.currentTarget.name);
 
   makePlanetKey = planetName => planetName.toLowerCase().replace(' ', '_');
 
@@ -37,8 +44,35 @@ class App extends Component {
       const { results, next, previous, count } = data;
       const residentsState = {};
 
+      let rotationPeriodSet = new Set(); 
+      let orbitalPeriodSet = new Set(); 
+      let diameterSet = new Set();  
+      let climateSet = new Set(); 
+      let gravitySet = new Set();  
+      let terrainSet = new Set(); 
+      let surfaceWaterSet = new Set(); 
+
       for (let planet of results) {
-        const { name, residents } = planet;
+        const { 
+          name, 
+          residents, 
+          rotation_period, 
+          orbital_period, 
+          diameter, 
+          climate, 
+          gravity, 
+          terrain, 
+          surface_water 
+        } = planet;
+
+        rotationPeriodSet.add(rotation_period); 
+        orbitalPeriodSet.add(orbital_period);
+        diameterSet.add(diameter);
+        climateSet.add(climate);
+        gravitySet.add(gravity);
+        terrainSet.add(terrain);
+        surfaceWaterSet.add(surface_water);
+
         let planetResidents = [];
         for (let resident of residents) {
           const response = await fetch(resident);
@@ -71,12 +105,19 @@ class App extends Component {
         count: count,
         showingStart: showingStart,
         showingEnd: showingEnd,
+        rotationPeriods: [...rotationPeriodSet], 
+        orbitalPeriods: [...orbitalPeriodSet], 
+        diameters: [...diameterSet], 
+        climates: [...climateSet], 
+        gravities: [...gravitySet], 
+        terrains: [...terrainSet], 
+        surfaceWaters: [...surfaceWaterSet],
         loading: false
       });
     }
     catch(error) {
       throw Error(error);
-      this.setState({ loading: false });
+      // this.setState({ loading: false });
     }
   }
 
@@ -85,20 +126,16 @@ class App extends Component {
   }
 
   render() {
-    const { planets } = this.state;
-    console.log(this.state.loading);
-
     return (
-      <div className="App tc">
-        <header className="App-header">
-          <h1>Star Wars Planet Intel</h1>
-        </header>
+      <div className="App">
         <ErrorBoundryLoading isLoading={this.state.loading}>
-          <Navbar state={this.state} prevClick={this.prevClick} nextClick={this.nextClick}  />
-            <ItemList state={this.state} makePlanetKey={this.makePlanetKey}>
-              <Item />
-            </ItemList>
-          <Navbar state={this.state} prevClick={this.prevClick} nextClick={this.nextClick}  />
+          <header className="App-header">
+            <h1>Star Wars Planet Intel</h1>
+            <Navbar state={this.state} prevClick={this.prevClick} nextClick={this.nextClick}  />
+          </header>
+          <ItemList state={this.state} makePlanetKey={this.makePlanetKey}>
+            <Item />
+          </ItemList>
         </ErrorBoundryLoading>
       </div>
     );
